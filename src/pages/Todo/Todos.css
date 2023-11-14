@@ -1,0 +1,28 @@
+.todos__status {
+  width: 90%;
+  margin: 1rem auto;
+}
+
+.todos__status form {
+  display: flex;
+  align-items: center;
+}
+
+.todos__status form * {
+  margin: 0 0.5rem;
+}
+
+.todos__control {
+  text-align: center;
+}
+
+.new-post__preview-image {
+  width: 15rem;
+  height: 7rem;
+}
+
+@media (min-width: 768px) {
+  .todos__status {
+    width: 30rem;
+  }
+}
