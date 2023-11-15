@@ -107,7 +107,7 @@ class Todos extends Component {
       })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Can't Add Todo!");
+          throw new Error("Please enter todo!");
         }
         return res.json();
       })
@@ -215,7 +215,7 @@ class Todos extends Component {
                   key={todo._id}
                   id={todo._id}
                   author={todo.creator.name}
-                  date={new Date(todo.createdAt).toLocaleDateString('en-US')}
+                  date={new Date(todo.createdAt).toLocaleDateString('en-IN')}
                   text={todo.text} 
                   onStartEdit={this.editTodoHandler.bind(this, todo._id)}
                   onDelete={this.deleteTodoHandler.bind(this, todo._id)}

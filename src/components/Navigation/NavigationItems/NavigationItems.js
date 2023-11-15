@@ -16,12 +16,12 @@ const navigationItems = props => [
       className={['navigation-item', props.mobile ? 'mobile' : ''].join(' ')}
     >
       <NavLink to={item.link} exact onClick={props.onChoose}>
-        {item.text === 'Hi' ? props.creator : item.text}
+        {item.text === 'Hi' ? 'Hi, '+props.creator : item.text}
       </NavLink>
     </li>
   )),
   props.isAuth && (
-    <li className="navigation-item" key="logout">
+    <li className={['navigation-item', props.mobile ? 'mobile' : ''].join(' ')} key="logout">
       <button onClick={props.onLogout}>Logout</button>
     </li>
   )

@@ -7,7 +7,7 @@ const todo = props => (
   <article className="todo">
     <header className="todo__header">
       <h3 className="todo__meta">
-        Todo added on {props.date}
+        Added on {props.date}
       </h3>
       <h1 className="todo__title">{props.text}</h1> 
     </header>

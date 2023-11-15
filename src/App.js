@@ -25,7 +25,7 @@ class App extends Component {
     userId: null,
     authLoading: false,
     error: null,
-    creator:''
+    creator:sessionStorage.getItem('creator')
   };
 
   componentDidMount() {
@@ -62,7 +62,26 @@ class App extends Component {
 
   loginHandler = (event, authData) => {
     event.preventDefault();
-    this.setState({ authLoading: true });
+    try{
+      if (authData.email === '' && authData.password === '') {
+        throw new Error('Please enter your login credential!');
+      }  
+      if (authData.email === '') {
+        throw new Error('Please enter email id!');
+      }
+      if (authData.password === '') {
+        throw new Error('Please enter your password!');
+      }
+    }
+    catch(err) {
+      this.setState({
+        isAuth: false,
+        authLoading: false,
+        error: err
+      });
+    }
+    if(authData.email !== '' && authData.password !== ''){
+      this.setState({ authLoading: true });
       fetch(`${apiUrl}/auth/login`,{
         method:'POST',
         headers:{
@@ -79,18 +98,19 @@ class App extends Component {
         }
         if (res.status !== 200 && res.status !== 201) {
           console.log('Error!');
-          throw new Error('Could not authenticate you!');
+          throw new Error('Please enter correct login credential!');
         }
         return res.json();
       })
       .then(resData => {
         console.log(`creator`+resData.userName);
+        sessionStorage.setItem('creator', resData.userName);
         this.setState({
           isAuth: true,
           token: resData.token,
           authLoading: false,
           userId: resData.userId,
-          creator:resData.userName
+          creator:sessionStorage.getItem('creator')
         });
         localStorage.setItem('token', resData.token);
         localStorage.setItem('userId', resData.userId);
@@ -109,12 +129,26 @@ class App extends Component {
           error: err
         });
       });
+    }
   };
 
   signupHandler = (event, authData) => {
     event.preventDefault();
-    this.setState({ authLoading: true });
-    fetch(`${apiUrl}/auth/signup`,{
+    try{
+      if (authData.signupForm.email.value === '' || authData.signupForm.password.value === '' || authData.signupForm.name.value === '') {
+        throw new Error('Please fill up the signup form!');
+      }      
+    }
+    catch(err) {
+      this.setState({
+        isAuth: false,
+        authLoading: false,
+        error: err
+      });
+    }
+    if(authData.signupForm.email.value !== '' && authData.signupForm.password.value !== '' && authData.signupForm.name.value !== ''){
+      this.setState({ authLoading: true });
+      fetch(`${apiUrl}/auth/signup`,{
         method:'PUT',
         headers:{
           'Content-Type':'application/json'//It won't work with file upload
@@ -126,9 +160,10 @@ class App extends Component {
         })
     })
       .then(res => {
+        console.log(res);
         if (res.status === 422) {
           throw new Error(
-            "Validation failed. Make sure the email address isn't used yet!"
+            "Email already exist!"
           );
         }
         if (res.status !== 200 && res.status !== 201) {
@@ -150,6 +185,7 @@ class App extends Component {
           error: err
         });
       });
+    }
   };
 
   setAutoLogout = milliseconds => {
