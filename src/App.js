@@ -80,7 +80,7 @@ class App extends Component {
         }
         if (res.status !== 200 && res.status !== 201) {
           console.log('Error!');
-          throw new Error('Could not authenticate you!');
+          throw new Error('Please enter the correct credential!');
         }
         return res.json();
       })
