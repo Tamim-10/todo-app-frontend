@@ -25,7 +25,7 @@ class App extends Component {
     userId: null,
     authLoading: false,
     error: null,
-    creator:sessionStorage.getItem('creator')
+    creator:localStorage.getItem('creator')
   };
 
   componentDidMount() {
@@ -58,6 +58,7 @@ class App extends Component {
     localStorage.removeItem('token');
     localStorage.removeItem('expiryDate');
     localStorage.removeItem('userId');
+    localStorage.removeItem('creator');
   };
 
   loginHandler = (event, authData) => {
@@ -104,14 +105,14 @@ class App extends Component {
         return res.json();
       })
       .then(resData => {
-        console.log(`creator`+resData.userName);
-        sessionStorage.setItem('creator', resData.userName);
+        console.log(`creator`+resData.userName); 
+        localStorage.setItem('creator', resData.userName);
         this.setState({
           isAuth: true,
           token: resData.token,
           authLoading: false,
           userId: resData.userId,
-          creator:sessionStorage.getItem('creator')
+          creator:localStorage.getItem('creator')
         });
         localStorage.setItem('token', resData.token);
         localStorage.setItem('userId', resData.userId);
