@@ -14,7 +14,7 @@ import SignupPage from './pages/Auth/Signup';
 import './App.css';
 
 const apiUrl = process.env.REACT_APP_API_URL;
-console.log(process.env);  
+console.log(process.env);
 
 class App extends Component {
   state = {
@@ -63,15 +63,19 @@ class App extends Component {
 
   loginHandler = (event, authData) => {
     event.preventDefault();
+    let errorMessages = [];
     try{
-      if (authData.email === '' && authData.password === '') {
-        throw new Error('Please enter your login credential!');
-      }  
+      // if (authData.email === '' && authData.password === '') {
+      //   errorMessages.push('Please enter your login credential!');
+      // }  
       if (authData.email === '') {
-        throw new Error('Please enter email id!');
+        errorMessages.push('Please enter email id!');
       }
       if (authData.password === '') {
-        throw new Error('Please enter your password!');
+        errorMessages.push('Please enter your password!');
+      }
+      if (errorMessages.length > 0) {
+        throw new Error(errorMessages);
       }
     }
     catch(err) {
@@ -136,59 +140,96 @@ class App extends Component {
 
   signupHandler = (event, authData) => {
     event.preventDefault();
-    try{
-      if (authData.signupForm.email.value === '' || authData.signupForm.password.value === '' || authData.signupForm.name.value === '') {
-        throw new Error('Please fill up the signup form!');
-      }      
-    }
-    catch(err) {
+    let isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(authData.signupForm.password.value);
+    let errorMessages = [];
+
+    try { 
+      if (authData.signupForm.email.value === '') {
+        errorMessages.push('Please enter your email!');
+      }
+      if (authData.signupForm.name.value === '') {
+        errorMessages.push('Please enter your first name!');
+      }
+      if (authData.signupForm.password.value === '') {
+        errorMessages.push('Please create your password!');
+      }
+      if(!isValid){
+        errorMessages.push('Password must be at least 8 characters long with at least 1 uppercase and lowercase letter and 1 digit');
+      }
+  
+      // let isValid = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(authData.signupForm.password.value);
+      // if (authData.signupForm.email.value !== '' && !isValid) {
+      //   errorMessages.push('Please create a strong password');
+      // }
+  
+      if (errorMessages.length > 0) {
+        throw new Error(errorMessages);
+      }
+    } catch (err) {
+      // console.log(err);
       this.setState({
         isAuth: false,
         authLoading: false,
-        error: err
+        error: err,
       });
     }
-    if(authData.signupForm.email.value !== '' && authData.signupForm.password.value !== '' && authData.signupForm.name.value !== ''){
+  
+    if (errorMessages.length === 0) {
       this.setState({ authLoading: true });
-      fetch(`${apiUrl}/auth/signup`,{
-        method:'PUT',
-        headers:{
-          'Content-Type':'application/json'//It won't work with file upload
+      fetch(`${apiUrl}/auth/signup`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json', //It won't work with file upload
         },
-        body:JSON.stringify({
+        body: JSON.stringify({
           email: authData.signupForm.email.value,
           name: authData.signupForm.name.value,
-          password: authData.signupForm.password.value
+          password: authData.signupForm.password.value,
+        }),
+      })
+        .then((res) => {
+          // console.log(res);
+          // if (res.status === 422) {
+          //   throw new Error('Email already exists!');
+          // }
+          // if (res.status !== 200 && res.status !== 201) {
+          //   console.log('Error!');
+          //   throw new Error('Creating a user failed!');
+          // }
+          return res.json();
         })
-    })
-      .then(res => {
-        console.log(res);
-        if (res.status === 422) {
-          throw new Error(
-            "Email already exist!"
-          );
-        }
-        if (res.status !== 200 && res.status !== 201) {
-          console.log('Error!');
-          throw new Error('Creating a user failed!');
-        }
-        return res.json();
-      })
-      .then(resData => {
-        console.log(resData);
-        this.setState({ isAuth: false, authLoading: false });
-        this.props.history.replace('/');
-      })
-      .catch(err => {
-        console.log(err);
-        this.setState({
-          isAuth: false,
-          authLoading: false,
-          error: err
+        .then((resData) => {
+          console.log(resData); 
+          // console.log(resData.data);
+          try{
+            if (resData.data) {
+              errorMessages.push(resData.data[0].msg);
+              throw new Error(errorMessages);
+            }
+          }catch (err) {
+            // console.log(err);
+            this.setState({
+              isAuth: false,
+              authLoading: false,
+              error: err,
+            });
+          }
+          if (!resData.data) {
+            this.setState({ isAuth: false, authLoading: false });
+            this.props.history.replace('/'); 
+          }
+        })
+        .catch((err) => {
+          console.log(err.message);
+          this.setState({
+            isAuth: false,
+            authLoading: false,
+            error: err.message,
+          });
         });
-      });
     }
   };
+  
 
   setAutoLogout = milliseconds => {
     setTimeout(() => {

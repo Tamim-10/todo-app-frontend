@@ -12,16 +12,16 @@ const modal = props =>
       </header>
       <div className="modal__content">{props.children}</div>
       <div className="modal__actions">
-        <Button design="danger" mode="flat" onClick={props.onCancelModal}>
+        {/* <Button design="danger" mode="flat" onClick={props.onCancelModal}>
           Cancel
-        </Button>
+        </Button> */}
         <Button
           mode="raised"
           onClick={props.onAcceptModal}
           disabled={!props.acceptEnabled}
           loading={props.isLoading}
         >
-          Accept
+          Close
         </Button>
       </div>
     </div>,

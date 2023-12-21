@@ -90,8 +90,8 @@ class Todos extends Component {
     event.preventDefault();
     console.log(this.state.text);
     let url=`${apiUrl}/todo`;
-    let method = 'POST'; 
-    if (this.state.editTodo) {
+    let method = 'POST';  
+    if (this.state.editTodo && this.state.isEditing) {
       url = `${apiUrl}/todo/${this.state.editTodo._id}`;
       method = 'PUT';
     }  
@@ -104,7 +104,7 @@ class Todos extends Component {
         body:JSON.stringify({
           text:this.state.text
         })
-      })
+      })  
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
           throw new Error("Please enter todo!");
@@ -113,10 +113,17 @@ class Todos extends Component {
       })
       .then(resData => {
         console.log(resData);
-        this.setState({ text: '' });
+        if(this.state.isEditing){
+          console.log('update');
+          this.setState({ isEditing:false});
+          method='POST';
+        }
+        this.setState({ text:''});
+        this.loadTodos();
       })
       .catch(this.catchError);
-      this.loadTodos();
+      console.log('method-',method);
+      console.log('isEditing-',this.state.isEditing);
   };
 
   editTodoHandler = todoId => {
@@ -151,10 +158,27 @@ class Todos extends Component {
       })
       .then(resData => {
         console.log(resData);
+        let page = this.state.todoPage;
+        // if (direction === 'next') {
+        //   page++;
+        //   this.setState({ todoPage: page });
+        // }
         this.setState(prevState => {
           const updatedTodos = prevState.todos.filter(p => p._id !== todoId);
-          return { todos: updatedTodos, todosLoading: false };
+          console.log(updatedTodos.length);
+          if(updatedTodos.length === 0){
+            page--;
+          }
+          if(page === 0){
+            page = 1;
+          }
+          return { todos: updatedTodos, todosLoading: false ,todoPage: page};
         });
+        
+      })
+      .then((res)=>{
+        // this.setState({ todoPage: 1 }); 
+        this.loadTodos(); 
       })
       .catch(err => {
         console.log(err);
@@ -207,7 +231,7 @@ class Todos extends Component {
             <Paginator
               onPrevious={this.loadTodos.bind(this, 'previous')}
               onNext={this.loadTodos.bind(this, 'next')}
-              lastPage={Math.ceil(this.state.totalTodos / 2)}
+              lastPage={Math.ceil(this.state.totalTodos / 3)}
               currentPage={this.state.todoPage}
             > 
               {this.state.todos.map(todo => (

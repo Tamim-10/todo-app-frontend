@@ -13,7 +13,10 @@ const errorHandler = props => (
         onAcceptModal={props.onHandle}
         acceptEnabled
       >
-        <p>{props.error.message}</p>
+        {props.error.message && props.error.message.split(',').map((message, index) => (
+          <p key={index}>{message}</p>
+        ))} 
+        {/* <p>{props.error.message}</p> */}
       </Modal>
     )}
   </Fragment>
