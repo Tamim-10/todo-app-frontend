@@ -176,13 +176,16 @@ class Todos extends Component {
         });
         
       })
-      .then((res)=>{
-        // this.setState({ todoPage: 1 }); 
-        this.loadTodos(); 
-      })
+      // .then((res)=>{
+      //   // this.setState({ todoPage: 1 }); 
+      //   this.loadTodos(); 
+      // })
       .catch(err => {
         console.log(err);
         this.setState({ todosLoading: false });
+      })
+      .finally(() => {
+        this.loadTodos();
       });
   };
 
